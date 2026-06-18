@@ -14,14 +14,24 @@
   </head>
   <body>
     <header class="site-header">
-      <h1>La mia libreria - esplora Open Library</h1>
-      <p>
-        Cerca libri reali da Open Library e aggiungili alla tua libreria
-        personale.
-      </p>
+      <div class="header-row">
+        <h1>La mia libreria - esplora Open Library</h1>
+        <p>
+          Cerca libri reali da Open Library e aggiungili alla tua libreria
+          personale.
+        </p>
+      </div>
+      <div id="auth-box" class="auth-box">
+        <!-- Popolato da JS -->
+      </div>
     </header>
 
     <main class="container">
+      <section id="profilo-section" class="profilo-section" hidden>
+        <h2>Il tuo profilo</h2>
+        <div id="profilo" class="profilo"></div>
+      </section>
+
       <section class="cerca-section">
         <h2 class="fw-bold">Cerca</h2>
         <div class="campo">

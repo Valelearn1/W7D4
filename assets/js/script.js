@@ -304,3 +304,45 @@ ulRisultati.addEventListener("click", (e) => {
 fetch("https://dummyjson.com/test")
   .then((res) => res.json())
   .then(console.log);
+
+function getToken() {
+  return localStorage.getItem("auth.token"); // la funzione legge il valore e lo restituisce
+}
+
+// getUtente() ritorna l'oggetto utente oppure null se non esiste.
+function getUtente() {
+  return JSON.parse(localStorage.getItem("auth.user"));
+}
+
+// logout non deve ritornare nulla, no "return" needed.
+function logout() {
+  localStorage.removeItem("auth.token");
+  localStorage.removeItem("auth.user");
+  document.getElementById("profilo-section").classList.add("hidden"); // Nascondere la sezione profilo
+}
+
+async function login(username, password) {
+  try {
+    const response = await fetch("https://dummyjson.com/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+      credentials: "include", // Include cookies (e.g., accessToken) in the request
+    });
+    const dati = await response.json();
+    if (!response.ok) {
+      throw new Error("Credenziali non valide");
+    }
+    localStorage.setItem("auth.token", dati.accessToken);
+    localStorage.setItem("auth.user", JSON.stringify(dati));
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function caricaProfilo() {
+  const token = getToken();
+  if (!token) {
+    return null;
+  }
+}
