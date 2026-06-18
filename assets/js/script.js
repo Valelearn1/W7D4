@@ -413,3 +413,34 @@ async function gestisciLogin(e) {
     alert(err.message);
   }
 }
+
+async function mostraProfilo() {
+  if (!getToken()) {
+    return;
+  }
+  try {
+    const profilo = await caricaProfilo();
+
+    // inserisce immagine e dati testuali nel div #profilo
+    document.getElementById("profilo").innerHTML = `
+      <img src="${profilo.image}">
+      <div class="info">
+        <p><strong>${profilo.firstName} ${profilo.lastName}</strong></p>
+        <p>@${profilo.username} - ${profilo.email}</p>
+      </div>
+    `;
+
+    // rende visibile la sezione profilo (rimuove l'attributo hidden)
+    document.getElementById("profilo-section").removeAttribute("hidden");
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function avvio() {
+  renderLibri();       // disegna la lista libri
+  renderAuthBox();     // mostra login o saluto in base allo stato
+  await mostraProfilo(); // se già loggato, mostra subito il profilo
+}
+
+avvio();
