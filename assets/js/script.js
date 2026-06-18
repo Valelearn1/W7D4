@@ -336,7 +336,7 @@ async function login(username, password) {
     localStorage.setItem("auth.token", dati.accessToken);
     localStorage.setItem("auth.user", JSON.stringify(dati));
   } catch (err) {
-    console.error(err);
+    throw err;
   }
 }
 
@@ -345,6 +345,13 @@ async function caricaProfilo() {
   if (!token) {
     return null;
   }
+  const response = await fetch("https://dummyjson.com/auth/me", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) {
+    throw new Error("Sessione scaduta");
+  }
+  return response.json();
 }
 
 function renderAuthBox() {
@@ -363,6 +370,11 @@ function renderAuthBox() {
       logout();
       renderAuthBox();
     });
+
+    const box = document.getElementById("auth-box");
+    box.innerHTML = "";
+    box.appendChild(span);
+    box.appendChild(btn);
   } else {
     const form = document.createElement("form");
     form.id = "form-login";
@@ -400,14 +412,14 @@ async function gestisciLogin(e) {
   const password = document.getElementById("login-password").value;
 
   try {
-    // prova a fare login — salva token e utente nel localStorage
-    await login(username, password);
+    await login(username, password); // login deve finire prima (serve il token)
 
-    // aggiorna l'auth-box mostrando il saluto con il nome utente
+    const [profilo, ricerca] = await Promise.all([
+      caricaProfilo(), // parte
+      cerca("harari"), // parte contemporaneamente
+    ]);
     renderAuthBox();
-
-    // carica e mostra i dati del profilo
-    await mostraProfilo();
+    mostraProfilo();
   } catch (err) {
     // se login fallisce (credenziali errate, rete, ecc.) mostra l'errore
     alert(err.message);
@@ -438,8 +450,8 @@ async function mostraProfilo() {
 }
 
 async function avvio() {
-  renderLibri();       // disegna la lista libri
-  renderAuthBox();     // mostra login o saluto in base allo stato
+  renderLibri(); // disegna la lista libri
+  renderAuthBox(); // mostra login o saluto in base allo stato
   await mostraProfilo(); // se già loggato, mostra subito il profilo
 }
 
