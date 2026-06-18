@@ -346,3 +346,70 @@ async function caricaProfilo() {
     return null;
   }
 }
+
+function renderAuthBox() {
+  const utente = getUtente();
+  if (utente) {
+    const span = document.createElement("span");
+    span.classList.add("saluto");
+    span.textContent = `Ciao ${utente.firstName}`;
+
+    const btn = document.createElement("button");
+    btn.classList.add("btn-logout");
+    btn.id = "btn-logout"; // creazione id
+    btn.textContent = "Esci";
+
+    btn.addEventListener("click", (e) => {
+      logout();
+      renderAuthBox();
+    });
+  } else {
+    const form = document.createElement("form");
+    form.id = "form-login";
+
+    const inputName = document.createElement("input");
+    inputName.id = "login-username";
+    inputName.value = "emilys";
+
+    const inputPass = document.createElement("input");
+    inputPass.id = "login-password";
+    inputPass.type = "password";
+    inputPass.value = "emilyspass";
+
+    const btnSubmit = document.createElement("button");
+    btnSubmit.type = "submit";
+    btnSubmit.textContent = "Accedi";
+
+    form.appendChild(inputName);
+    form.appendChild(inputPass);
+    form.appendChild(btnSubmit);
+
+    form.addEventListener("submit", gestisciLogin);
+
+    const box = document.getElementById("auth-box");
+    box.innerHTML = ""; // svuota prima di aggiungere, così se renderAuthBox() viene chiamata più volte non accumula elementi duplicati.
+    box.appendChild(form);
+  }
+}
+
+async function gestisciLogin(e) {
+  e.preventDefault();
+
+  // legge i valori dai due input
+  const username = document.getElementById("login-username").value;
+  const password = document.getElementById("login-password").value;
+
+  try {
+    // prova a fare login — salva token e utente nel localStorage
+    await login(username, password);
+
+    // aggiorna l'auth-box mostrando il saluto con il nome utente
+    renderAuthBox();
+
+    // carica e mostra i dati del profilo
+    await mostraProfilo();
+  } catch (err) {
+    // se login fallisce (credenziali errate, rete, ecc.) mostra l'errore
+    alert(err.message);
+  }
+}
